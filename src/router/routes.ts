@@ -17,5 +17,22 @@ export const routes: RouteRecordRaw[] = [
         meta: {
             layout: 'AppLayoutDefault'
         }
+    },
+    {
+        path: '/registro',
+        name: 'register',
+        component: () => import('@/views/RegisterPage.vue'),
+        meta: {
+            layout: 'AppLayoutDefault'
+        }
+    },
+    {
+        path: '/consola',
+        name: 'console',
+        component: () => import('@/views/AdminConsole.vue'),
+        meta: {
+            layout: 'AppLayoutDefault',
+            requiresAuth: true,
+        }
     }
 ]

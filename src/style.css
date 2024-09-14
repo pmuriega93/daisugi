@@ -2,14 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&display=swap');
+@import 'primeicons/primeicons.css';
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+    h1 {
+        @apply text-2xl font-semibold;
+    }
+}
 
 
 html {
     box-sizing: border-box;
+    scroll-behavior: smooth;
 }
 *, *:before, *:after {
 box-sizing: inherit;
@@ -17,4 +25,12 @@ box-sizing: inherit;
 
 * {
     position: relative;
+}
+
+.separator {
+    @apply w-full h-[2px] bg-gray-500 opacity-20 mb-3;
+}
+
+.button {
+    @apply bg-primary-blue-500 mt-5 px-14;
 }

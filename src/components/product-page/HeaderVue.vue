@@ -6,9 +6,12 @@ const router = useRouter();
 
 
 const goToLogin = () => {
-    router.replace({ name: 'login' })
+    router.push({ name: 'login' })
 }
 
+const goToRegister = () => {
+    router.push({ name: 'register' })
+}
 
 </script>
 <template>
@@ -37,7 +40,7 @@ const goToLogin = () => {
 
             <div class="flex items-center gap-7 pr-12">
                 <Button @click="goToLogin" class="border-primary-blue-500 text-primary-blue-500 px-7" label="Inicia sesión" size="small" rounded outlined />
-                <Button class="bg-primary-blue-500 hover:bg-primary-blue-300 px-7" label="Registrate" size="small" rounded />
+                <Button @click="goToRegister" class="bg-primary-blue-500 hover:bg-primary-blue-300 px-7" label="Registrate" size="small" rounded />
             </div>
         </nav>
     </header>

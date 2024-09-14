@@ -1,4 +1,4 @@
-import './assets/style.css'
+import './style.css'
 import 'tailwindcss/tailwind.css';
 import AOS from 'aos'
 

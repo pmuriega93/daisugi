@@ -1,27 +1,57 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
+import { useRouter } from "vue-router";
+import useVuelidate from '@vuelidate/core';
+import { hasLowerCase, hasMinLength, hasNumber, hasSpecialChar, hasUpperCase, isEmail, isRequired } from '@/helpers/validators';
+import { useLogin } from '@/composables/useLogin';
 
-const user = ref<string>();
-const password = ref<string>();
-const errorMessage = reactive({
-    hasErrors: false,
-    msg: '',
-})
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
+
+const show = () => {
+    toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
+};
+
 const success = ref(false);
 
-const onSubmit = () => {
-    if (user.value && user.value.length > 0 && password.value && password.value.length > 0) {
-        success.value = true;
-        setTimeout(() => {
-            success.value = false;
-        }, 2000);
-    } else {
-        errorMessage.hasErrors = true;
-        errorMessage.msg = 'Datos incorrectos. Revise los campos e intente nuevamente';
-    }
+const router = useRouter();
+
+const { login, isLoading, errors } = useLogin();
+
+const validations = {
+    email: { isRequired, isEmail },
+    password: { isRequired, hasUpperCase, hasLowerCase, hasMinLength: hasMinLength(6), hasNumber, hasSpecialChar },
 }
+const state = reactive({ email: '', password: '' });
+const v$ = useVuelidate(validations, state, { $lazy: true });
+
+const emailErrors = computed(() => v$.value.$errors.find((error:any) => error.$property === 'email'));
+const passwordErrors = computed(() => v$.value.$errors.find((error:any) => error.$property === 'password'));
+
+const showPassword = ref(false);
+
+const onSubmit = async() => {
+    const isFormCorrect = await v$.value.$validate();
+    if (!isFormCorrect) return;
+
+
+    await login(state.email, state.password)
+    
+    if (errors.hasErrors) {
+        return;
+    }
+    success.value = true;
+}
+
+watch(success, (val) => {
+    if (val) {
+        show();
+        router.push({name: 'console'});
+    }
+})
+
 
 </script>
 <template>
@@ -29,19 +59,27 @@ const onSubmit = () => {
 
         <img src="/logo/daisugi-logo.png" />
 
-        <form @submit.prevent="onSubmit" class="flex flex-col gap-5 items-center justify-center">
-            <div class="flex flex-col gap-3">
-                <label for="user" class="text-black-text text-lg">Nombre de usuario</label>
-                <input v-model="user" type="text" class="border border-gray-400 rounded-md py-1 px-1" name="user" id="user">
+        <form @submit.prevent="onSubmit" class="w-80 flex flex-col gap-5 items-center justify-center">
+            <div class="flex flex-col gap-3 w-full">
+                <label for="user" class="text-black-text text-lg">Email</label>
+                <input v-model="state.email" type="text" class="border border-gray-400 rounded-md py-1 px-2" name="user" id="user">
+                <span v-if="emailErrors" class="text-red-500">{{ emailErrors.$message.toString() }}</span>
             </div>
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3 w-full">
                 <label for="password" class="text-black-text text-lg">Contraseña</label>
-                <input v-model="password" type="password" class="border border-gray-400 rounded-md py-1 px-1" name="password" id="password">
+                <input v-model="state.password" :type="showPassword ? 'text' : 'password'" class="border border-gray-400 rounded-md py-1 px-2" name="password" id="password" />
+                <div @click="showPassword = !showPassword" class="text-gray-600 cursor-pointer absolute right-3 top-11">
+                    <i v-if="showPassword" class="pi pi-eye" />
+                    <i v-else class="pi pi-eye-slash" />
+                </div>
+
+                <span v-if="passwordErrors" class="text-red-500">{{ passwordErrors.$message.toString() }}</span>
             </div>
 
-            <Button class="bg-primary-blue-500 mt-5 px-14" type="submit" rounded label="Ingresar" />
+            <Button class="button" type="submit" rounded label="Ingresar" :loading="isLoading" />
             <Toast class="mx-auto" position="bottom-center" />
             <Message v-if="success" severity="success">Logeado con éxito</Message>
+            <Message v-if="errors.hasErrors" severity="error">{{ errors.msg }}</Message>
         </form>
 
     </section>
