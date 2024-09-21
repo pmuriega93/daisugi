@@ -1,77 +1,50 @@
 <script setup lang="ts">
-import { reactive, ref, computed, watch } from 'vue';
+import { computed, reactive, ref } from 'vue';
+import useVuelidate from '@vuelidate/core';
 import Button from 'primevue/button';
 import Message from 'primevue/message';
-import useVuelidate from '@vuelidate/core';
-import { useRouter } from 'vue-router';
-import { areEqual, hasLowerCase, hasMinLength, hasNumber, hasSpecialChar, hasUpperCase, isEmail, isRequired } from '@/helpers/validators';
-import { useRegister } from '@/composables/useRegister';
+import { areEqual, hasLowerCase, hasMinLength, hasNumber, hasSpecialChar, hasUpperCase, isRequired } from '@/helpers/validators';
+import { useRecoverPassword } from '@/composables/useRecoverPassword';
+import { useRoute } from 'vue-router';
 
-import { useToast } from "primevue/usetoast";
-const toast = useToast();
+const route = useRoute()
 
-const show = () => {
-    toast.add({ severity: 'info', summary: 'Info', detail: 'Message Content', life: 3000 });
-};
-
-const router = useRouter();
-
-const success = ref(false);
+const token = computed(() => route.query.token?.toString() || '')
 
 const showPassword = ref(false);
 const showPasswordRepeat = ref(false);
 
+
 const validations = {
-    user: { isRequired },
-    email: { isRequired, isEmail },
     password: { isRequired, hasUpperCase, hasLowerCase, hasMinLength: hasMinLength(6), hasNumber, hasSpecialChar },
     repeatPassword: { isRequired, areEqual: areEqual(computed(() => state.password)) } }
 const state = reactive({ user: '', email: '', password: '', repeatPassword: '' });
 const v$ = useVuelidate(validations, state, { $lazy: true });
+const { 
+    resetPassword,
+    isLoading,
+    isSuccess,
+    hasErrors
+} = useRecoverPassword()
 
-const userErrors = computed(() => v$.value.$errors.find(error => error.$property === 'user'));
-const emailErrors = computed(() => v$.value.$errors.find(error => error.$property === 'email'));
 const passwordErrors = computed(() => v$.value.$errors.find(error => error.$property === 'password'));
 const repeatPasswordErrors = computed(() => v$.value.$errors.find(error => error.$property === 'repeatPassword'));
-
-const { register, errors, isLoading } = useRegister();
-
 const onSubmit = async() => {
     const isFormCorrect = await v$.value.$validate();
-    if (!isFormCorrect) return;
-    await register({ email: state.email, password: state.password, username: state.user })
+    if (!isFormCorrect || !token.value || token.value.length === 0) return;
 
-    if (errors.hasErrors) {
+    await resetPassword(state.password, token.value)
+    
+    if (hasErrors) {
         return;
     }
-    success.value = true;
 }
-
-
-watch(success, (val) => {
-    if (val) {
-        show();
-        router.push({name: 'console'});
-    }
-})
 
 </script>
 <template>
     <section class="w-full mx-auto h-screen flex flex-col gap-12 items-center justify-center">
-
         <img src="/logo/daisugi-logo.png" />
-
         <form @submit.prevent="onSubmit" class="w-96 max-w-[90vw] flex flex-col gap-5 items-center justify-center">
-            <div class="flex flex-col gap-3 w-full">
-                <label for="user" class="text-black-text text-lg">Nombre de usuario</label>
-                <input v-model="state.user" type="text" class="border border-gray-400 rounded-md py-1 px-1" name="user" id="user">
-                <span v-if="userErrors" class="text-red-500">{{ userErrors.$message.toString() }}</span>
-            </div>
-            <div class="flex flex-col gap-3 w-full">
-                <label for="user" class="text-black-text text-lg">Email</label>
-                <input v-model="state.email" type="text" class="border border-gray-400 rounded-md py-1 px-1" name="user" id="user">
-                <span v-if="emailErrors" class="text-red-500">{{ emailErrors.$message.toString() }}</span>
-            </div>
             <div class="flex flex-col gap-3 w-full">
                 <label for="password" class="text-black-text text-lg">Contraseña</label>
                 <input v-model="state.password" :type="showPassword ? 'text' : 'password'" class="border border-gray-400 rounded-md py-1 px-1" name="password" id="password">
@@ -94,15 +67,13 @@ watch(success, (val) => {
 
             </div>
 
-            <Button class="button" type="submit" rounded :loading="isLoading" label="Registrarse" />
-            <Toast class="mx-auto" position="bottom-center" />
-            <Message v-if="success" severity="success">Se ha registrado con éxito</Message>
-            <Message v-if="errors.hasErrors" severity="error">{{ errors.msg }}</Message>
+            <Button class="button" type="submit" rounded label="Resetear contraseña" :loading="isLoading" />
+            <Message v-if="isSuccess" severity="success">Se ha modificado la contraseña con éxito <br><RouterLink to="/login" class="underline text-blue-500">Ir al login</RouterLink></Message>
+            <Message v-if="hasErrors" severity="error">Link inválido</Message>
         </form>
 
     </section>
 </template>
-
 
 <style scoped>
 section {

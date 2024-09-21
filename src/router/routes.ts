@@ -19,6 +19,22 @@ export const routes: RouteRecordRaw[] = [
         }
     },
     {
+        path: '/recuperar-password',
+        name: 'password-recovery',
+        component: () => import('@/views/PasswordRecovery.vue'),
+        meta: {
+            layout: 'AppLayoutDefault'
+        }
+    },
+    {
+        path: '/reset-password',
+        name: 'password-reset',
+        component: () => import('@/views/PasswordReset.vue'),
+        meta: {
+            layout: 'AppLayoutDefault'
+        }
+    },
+    {
         path: '/registro',
         name: 'register',
         component: () => import('@/views/RegisterPage.vue'),

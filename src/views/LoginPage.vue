@@ -59,7 +59,7 @@ watch(success, (val) => {
 
         <img src="/logo/daisugi-logo.png" />
 
-        <form @submit.prevent="onSubmit" class="w-80 flex flex-col gap-5 items-center justify-center">
+        <form @submit.prevent="onSubmit" class="w-96 max-w-[90vw] flex flex-col gap-5 items-center justify-center">
             <div class="flex flex-col gap-3 w-full">
                 <label for="user" class="text-black-text text-lg">Email</label>
                 <input v-model="state.email" type="text" class="border border-gray-400 rounded-md py-1 px-2" name="user" id="user">
@@ -81,6 +81,10 @@ watch(success, (val) => {
             <Message v-if="success" severity="success">Logeado con éxito</Message>
             <Message v-if="errors.hasErrors" severity="error">{{ errors.msg }}</Message>
         </form>
+
+        <RouterLink to="/recuperar-password" class="underline text-blue-500">
+            ¿Olvidaste tu contraseña?
+        </RouterLink>
 
     </section>
 </template>
