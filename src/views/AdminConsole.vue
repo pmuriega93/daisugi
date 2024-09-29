@@ -1,83 +1,43 @@
 <script setup lang="ts">
-import TheHeader from '../components/admin-console/TheHeader.vue'
-import ClientList from '../components/admin-console/ClientList.vue'
-import FabButton from '../components/base/FabButton.vue'
-import EmptyClients from '../components/admin-console/EmptyClients.vue'
-import AddClient from '../components/admin-console/AddClient.vue'
-import EditClient from '../components/admin-console/EditClient.vue'
-import SendMail from '../components/admin-console/SendMail.vue'
+import TheHeader from '@/components/admin-console/TheHeader.vue';
+import TheSidebar from '@/components/admin-console/TheSidebar.vue';
+import { useLogin } from '@/composables/useLogin';
+import { useRouter } from 'vue-router';
 
+const { userInfo, logout } = useLogin()
+const router = useRouter()
 
-import { useClients } from '@/composables/useClients';
-import { ref, watch } from 'vue';
-import { useRouter } from 'vue-router'
-const router = useRouter();
-
-const { clients, deleteClient } = useClients();
-
-const isCreateClientModalVisible = ref(false);
-const isEditClientModalVisible = ref(false);
-const isSendMessageModalVisible = ref(false);
-
-const selectedClient = ref();
-
-function showModal() {
-    isCreateClientModalVisible.value = true;
-}
-
-function openEditModal(e:any) {
-    selectedClient.value = e;
-
-    isEditClientModalVisible.value = true;
-}
-
-function openMailModal(e:any) {
-    selectedClient.value = e;
-    isSendMessageModalVisible.value = true;
-}
-
-watch(isCreateClientModalVisible, (val, oldval) => {
-    if (!val && oldval) {
-        router.go(0);
+function callAction(e: string) {
+    if (e === 'logout') {
+        logout()
+        return;
     }
-})
 
-watch(isEditClientModalVisible, (val, oldval) => {
-    if (!val && oldval) {
-        router.go(0);
+    if (e === 'goToUserInfo') {
+        router.push({ name: 'userInfo' })
+        return;
     }
-})
 
+
+}
 
 </script>
 <template>
-    <div class="w-full">
-        <TheHeader />
-
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-semibold">Mis clientes</h1>
-            <template v-if="clients && clients.length === 0">
-                <div class="mt-12">
-                    <EmptyClients @btn-clicked="showModal" />
-                </div>
-            </template>
-            <template v-else>
-                <ClientList 
-                    :clients=clients
-                    @delete="e => deleteClient(e)"
-                    @edit="e => openEditModal(e)"
-                    @send-mail="e => openMailModal(e)"
-                />
-            </template>
+    <div class="w-full h-screen">
+        <div class="">
+            <TheHeader
+                :name="userInfo.fullName"
+                @button-clicked="e => callAction(e)"    
+            />
         </div>
 
-        <div class="flex justify-center">
-            <AddClient v-if="isCreateClientModalVisible" @close-modal="isCreateClientModalVisible = false" />
-            <EditClient v-if="isEditClientModalVisible" @close-modal="isEditClientModalVisible = false" :client="selectedClient" />
-            <SendMail v-if="isSendMessageModalVisible" @close-modal="isSendMessageModalVisible = false" :client="selectedClient" />
+        <div class="h-full flex items-start">
+            <TheSidebar />
+            <div class="container mx-auto p-5">
+                <RouterView />
+            </div>
         </div>
 
-        <FabButton @btn-clicked="showModal" />
     </div>
 </template>
 

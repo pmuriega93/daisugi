@@ -45,10 +45,23 @@ export const routes: RouteRecordRaw[] = [
     {
         path: '/consola',
         name: 'console',
+        redirect: { name: 'clients' },
         component: () => import('@/views/AdminConsole.vue'),
         meta: {
             layout: 'AppLayoutDefault',
             requiresAuth: true,
-        }
+        },
+        children: [
+            {
+                path: '',
+                name: 'clients',
+                component: () => import('@/views/ClientsList.vue'),
+            },
+            {
+                path: '/usuario',
+                name: 'userInfo',
+                component: () => import('@/views/UserInfo.vue'),
+            },
+        ],
     }
 ]

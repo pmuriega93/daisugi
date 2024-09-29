@@ -4,6 +4,7 @@ import { reactive, ref } from "vue";
 import { useCookies } from '@vueuse/integrations/useCookies';
 import { useUserStore } from '../stores/user';
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 
 export function useLogin() {
 
@@ -15,6 +16,9 @@ export function useLogin() {
 
     const cookies = useCookies(['jwt']);
     const store = useUserStore();
+
+    const { userInfo } = storeToRefs(store);
+
     const router = useRouter();
 
     async function login(email: string, password: string) {
@@ -27,8 +31,11 @@ export function useLogin() {
 
             if (!resp) throw new Error('Ha ocurrido un error. Intente nuevamente más tarde.')
 
-            cookies.set('jwt', resp.data.token)
+            const current = new Date();
+            const expireTime = current.setTime(current.getTime() + (30 * 60 * 1000))
+            cookies.set('jwt', resp.data.token, { expires: new Date(expireTime) })
             store.setLoginStatus(true);
+            store.saveUserInfo(resp.data);
 
             errors.hasErrors = false;
             errors.msg = '';
@@ -59,6 +66,7 @@ export function useLogin() {
         login,
         logout,
         isLoading,
-        errors
+        errors,
+        userInfo
     }
 }

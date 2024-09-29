@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import type { Client } from '@/interfaces/clients';
 import Button from 'primevue/button';
 
 const props = defineProps<{
-    clients: any[]
+    clients?: Client[]
 }>()
 
 const emit = defineEmits<{
-    (e: 'send-mail', id: string): void,
+    (e: 'send-mail', id: Client): void,
     (e: 'delete', id: string): void,
-    (e: 'edit', id: string): void,
+    (e: 'edit', id: Client): void,
 }>()
 
 </script>
