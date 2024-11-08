@@ -11,11 +11,7 @@ daisugiApi.interceptors.response.use(
     (error) => {
       if (error.response) {
         if (error.response.status === 401) {
-          // Redirect to login page
           router.push('/login')
-        } else {
-          // Show a generic error message
-          alert('An error occurred. Please try again later.')
         }
       }
       return Promise.reject(error)

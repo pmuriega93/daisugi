@@ -59,7 +59,7 @@ watch(success, (val) => {
 
 </script>
 <template>
-    <div class="fixed top-0 w-full h-full bg-black/50">
+    <div class="fixed top-0 w-full h-full">
         <div class="top-36 left-[35%] w-[500px] h-[500px] p-7 max-w-full flex flex-col items-center rounded-md bg-primary-blue-900 text-white">
             <header class="w-full flex items-center justify-between">
                 <h3 class="text-start font-semibold">Registrar cliente</h3>

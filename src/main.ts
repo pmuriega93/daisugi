@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import ConfirmationService from 'primevue/confirmationservice';
 
 import './style.css'
 import 'tailwindcss/tailwind.css';
@@ -18,5 +19,6 @@ app.use(createPinia())
 app.use(router)
 app.use(PrimeVue, { unstyled: true, pt: Tailwind });
 app.use(ToastService)
+app.use(ConfirmationService);
 
 app.mount('#app')

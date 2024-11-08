@@ -27,10 +27,18 @@ box-sizing: inherit;
     position: relative;
 }
 
+h2 {
+    @apply text-xl font-semibold;
+}
+
 .separator {
     @apply w-full h-[2px] bg-gray-500 opacity-20 mb-3;
 }
 
 .button {
     @apply bg-primary-blue-500 mt-5 px-14;
+}
+
+.confirm-modal {
+    @apply absolute p-5 min-h-[150px] min-w-[280px] bg-gray-100 rounded-md w-80;
 }

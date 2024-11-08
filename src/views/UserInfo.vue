@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useLogin } from '@/composables/useLogin';
+import ChangePassword from '@/components/user-info/ChangePassword.vue';
+import EditUser from '@/components/user-info/EditUser.vue';
 import { Icon } from '@iconify/vue';
-import { RouterLink } from 'vue-router';
 
-const { userInfo } = useLogin();
+
 </script>
 
 <template>
@@ -12,8 +12,10 @@ const { userInfo } = useLogin();
             <Icon icon="material-symbols:arrow-back-ios" /> <span class="text-lg">Volver</span>
         </RouterLink>
 
-        <div class="mt-8 rounded-lg p-7 flex items-center justify-center w-full bg-gray-200">
+        <h2 class="text-xl font-semibold mt-7">Mi perfil</h2>
 
-        </div>
+        <EditUser />
+
+        <ChangePassword />
     </section>
 </template>
