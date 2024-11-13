@@ -62,6 +62,36 @@ export const routes: RouteRecordRaw[] = [
                 name: 'userInfo',
                 component: () => import('@/views/UserInfo.vue'),
             },
+            {
+                path: '/audiencias',
+                name: 'audiences',
+                component: () => import('@/views/AudiencesList.vue'),
+            },
+            {
+                path: '/audiencias/:id',
+                name: 'audience-clients',
+                component: () => import('@/views/AudienceWithClients.vue'),
+            },
+            {
+                path: '/grupos/:id',
+                name: 'group-clients',
+                component: () => import('@/views/GroupClients.vue'),
+            },
+            {
+                path: '/emails',
+                name: 'emails',
+                component: () => import('@/views/EmailsList.vue'),
+            },
+            {
+                path: '/nueva-plantilla',
+                name: 'new-template',
+                component: () => import('@/views/CreateTemplate.vue'),
+            },
+            {
+                path: '/plantilla/:id',
+                name: 'view-template',
+                component: () => import('@/views/ViewTemplate.vue'),
+            },
         ],
     }
 ]

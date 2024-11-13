@@ -62,7 +62,7 @@ watch(success, (val, oldval) => {
         <form @submit.prevent="toggleConfirmModal">
             <div class="flex flex-col w-1/2 gap-3">
                 <div class="flex flex-col gap-3 w-full">
-                    <label for="old-password" class="text-black-text text-lg">Contraseña anterior:</label>
+                    <label for="old-password" class="text-black-text text-lg">Contraseña actual:</label>
                     <input v-model="state.oldPassword" :type="showOldPassword ? 'text' : 'password'" class="border border-gray-400 rounded-md py-1 px-1" name="old-password" id="old-password">
                     <div @click="showOldPassword = !showOldPassword" class="text-gray-600 cursor-pointer absolute right-3 top-11">
                         <i v-if="showOldPassword" class="pi pi-eye" />

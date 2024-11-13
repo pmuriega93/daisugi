@@ -5,6 +5,10 @@ const emit = defineEmits<{
     (e: 'btn-clicked'): void
 }>()
 
+defineProps<{
+    message: string
+}>()
+
 </script>
 <template>
     <div class="p-10 max-w-md w-full mx-auto rounded-md border border-gray-400 shadow-lg flex flex-col items-center justify-center">
@@ -12,7 +16,7 @@ const emit = defineEmits<{
             <i class="pi pi-times-circle text-4xl text-primary-blue-500" />
         </div>
 
-        <p>Todavía no tenés clientes registrados</p>
+        <p v-html="message" class="text-center" />
 
         <Button @click="emit('btn-clicked')" label="Cargar" rounded class="button w-32" />
     </div>

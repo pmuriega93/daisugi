@@ -1,10 +1,16 @@
 import { daisugiApi } from "@/plugins/axios";
 import { reactive, ref } from "vue"
 import { useCookies } from '@vueuse/integrations/useCookies';
+import type { Client } from "@/interfaces/clients";
+import { useClientsStore } from "@/stores/clients";
+import { storeToRefs } from "pinia";
 
 export function useClients() {
 
-    const clients = ref();
+    const clientsStore = useClientsStore();
+
+    const { clients } = storeToRefs(clientsStore);
+    
     const errors = reactive({
         hasErrors: false,
         msg: ''
@@ -24,7 +30,7 @@ export function useClients() {
             if (!resp) throw new Error();
             isLoading.value = false;
 
-            clients.value = resp.data;
+            clientsStore.saveClients(resp.data);
         } catch (err) {
             errors.hasErrors = true;
             errors.msg = 'Ha ocurrido un error. Intente nuevamente más tarde.';
@@ -32,49 +38,51 @@ export function useClients() {
         }
     }
 
-    getAllClients();
+    if (!clients.value) {
+        getAllClients();
+    }
 
 
-    async function addNewClient(email: string, fullName: string) {
+    async function addNewClient(client: Client) {
         isLoading.value = true;
         try {
             errors.hasErrors = false;
             errors.msg = '';
 
             const resp = await daisugiApi.post('/clients', {
-                email,
-                fullName
+                email: client.email,
+                fullName: client.fullName,
+                phone: client.phone,
+                file: client.file
             },
             {
                 headers: { Authorization: 'Bearer ' + cookies.get('jwt') }
             })
 
-            console.log(resp);
-           
+            if (resp && resp.data) {
+                clients.value?.push(resp.data);
+            }
+
             isLoading.value = false;
 
         } catch (error) {
-
             errors.hasErrors = true;
             errors.msg = 'No se pudo cargar el usuario'
             isLoading.value = false;
         }
 
-        await getAllClients();
-
     }
 
-    async function deleteClient(id: string) {
+    async function deleteClient(client: Client) {
         isLoading.value = true;
         try {
-            await daisugiApi.delete('/clients/'+id,
+            clients.value = clients.value?.filter(cl => cl.id !== client.id);
+
+            await daisugiApi.delete('/clients/'+client.id,
                 {
                     headers: { Authorization: 'Bearer ' + cookies.get('jwt') }
                 }
             )
-
-            await getAllClients();
-
         } catch (error) {
             errors.hasErrors = true;
             errors.msg = 'No se pudo borrar el usuario'
@@ -82,21 +90,29 @@ export function useClients() {
         }
     }
 
-    async function editClient(id: string, body: any) {
+    async function deleteMultiple(clients: Client[]) {
+        for (const client of clients) {
+            await deleteClient(client);
+        }
+    }
+
+    async function editClient(id: string, body: Partial<Client>) {
         isLoading.value = true;
+        if (body.id) delete body.id
         try {
-            await daisugiApi.patch('/clients/'+id,
+            const resp = await daisugiApi.patch('/clients/'+id,
                 {
-                    email: body.email,
-                    fullName: body.name
+                    ...body
                 },
                 {
                     headers: { Authorization: 'Bearer ' + cookies.get('jwt') }
                 }
             )
 
-            await getAllClients();
-
+            if (resp && resp.data && clients.value) {
+                const editedClientIdx = clients.value?.findIndex(cl => cl.id === id);
+                clients.value[editedClientIdx] = resp.data;
+            }
         } catch (error) {
             errors.hasErrors = true;
             errors.msg = 'No se pudo editar el usuario'
@@ -110,6 +126,7 @@ export function useClients() {
         addNewClient,
         isLoading,
         deleteClient,
+        deleteMultiple,
         editClient
     }
 }
